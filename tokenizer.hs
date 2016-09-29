@@ -1,13 +1,11 @@
-module Tokenizer(Token, specialChars, tokenize) where
+module Tokenizer(Token(..), specialChars, tokenize) where
 
-data Token = LParen | RParen | ListChar | NewLine | Literal [Char] | Word [Char] 
+data Token = LParen | RParen | NewLine | Word [Char] 
 
 instance Show Token where
 	show LParen      = show "("
 	show RParen      = show ")"
-	show ListChar    = show "\'"
 	show NewLine     = show '\n'
-	show (Literal x) = show x
 	show (Word    x) = show x
 
 specialChars :: [Char]
@@ -17,9 +15,8 @@ tokenize :: [Char] -> [Token]
 tokenize []     = []
 tokenize ('(' :xs) = LParen   : tokenize xs
 tokenize (')' :xs) = RParen   : tokenize xs
-tokenize ('\'':xs) = ListChar : tokenize xs 
 tokenize ('\n':xs) = NewLine  : tokenize xs
-tokenize ('"' :xs) = (Literal quote) : tokenize remaining
+tokenize ('"' :xs) = (Word quote) : tokenize remaining
 	where 
 		quoteAux :: [Char] -> [Char] -> ([Char], [Char])
 		quoteAux build ('\"':xs)   = (build, xs) 
@@ -37,7 +34,6 @@ tokenize xs        = (Word word) : tokenize remaining
 			| elem x specialChars = (build, x:xs)
 			| otherwise           = takeWord (build ++ [x]) xs 
 		(word, remaining) = takeWord [] xs
-
 
 
 
